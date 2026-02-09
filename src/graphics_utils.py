@@ -342,13 +342,13 @@ class GLDrawer:
         """Draw a subtle gradient background."""
         glDisable(GL_TEXTURE_2D)
         
-        # Create vertical gradient (darker at top, slightly lighter at bottom)
+        # Create subtle vertical gradient
         glBegin(GL_QUADS)
-        glColor4f(0.015, 0.02, 0.04, 1.0)  # Top - deep dark
+        glColor4f(0.02, 0.03, 0.05, 1.0)  # Top - very dark navy
         glVertex2f(0, height)
         glVertex2f(width, height)
         
-        glColor4f(0.035, 0.045, 0.07, 1.0)  # Bottom - slightly lighter
+        glColor4f(0.03, 0.04, 0.07, 1.0)  # Bottom - slightly lighter
         glVertex2f(width, 0)
         glVertex2f(0, 0)
         glEnd()
