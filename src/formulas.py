@@ -104,15 +104,6 @@ def ease_out_quad(t: float) -> float:
     return 1 - (1 - t) * (1 - t)
 
 
-def ease_out_bounce(t: float) -> float:
-    """Bounce effect easing."""
-    if t < 0.5:
-        return 8 * t * t * t * t
-    else:
-        t = 1 - t
-        return 1 - 8 * t * t * t * t
-
-
 def get_inflation_stage(purchasing_power: float) -> str:
     """Categorize inflation severity."""
     if purchasing_power >= 70:
@@ -126,8 +117,8 @@ def get_inflation_stage(purchasing_power: float) -> str:
 def get_color_for_value(purchasing_power: float) -> tuple[float, float, float]:
     """Get color based on purchasing power (green → yellow → red)."""
     if purchasing_power > 70:
-        return (0.2, 0.85, 0.5)  # Green
+        return (0.25, 0.90, 0.55)  # Fresh green
     elif purchasing_power > 40:
-        return (0.95, 0.75, 0.2)  # Yellow/Orange
+        return (1.0, 0.78, 0.25)  # Warm yellow
     else:
-        return (0.95, 0.35, 0.25)  # Red
+        return (1.0, 0.38, 0.32)  # Clean red
