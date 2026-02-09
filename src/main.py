@@ -26,6 +26,7 @@ import numpy as np
 import json
 import math
 import os
+import sys
 from pathlib import Path
 
 # Local imports
@@ -39,7 +40,7 @@ from graphics_utils import GLDrawer, TextRenderer, flip_y
 def load_config():
     """Load configuration from JSON."""
     config_path = Path(__file__).parent / "config.json"
-    with open(config_path, 'r') as f:
+    with open(config_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
@@ -524,8 +525,8 @@ class InflationVisualizer:
         denom_value = DENOMINATIONS[self.denom]["value"]
 
         what_buys = TEXT["what_buys_today"].format(denom=denom_value)
-        self.text_renderer.render(what_buys, 1030, 130, WINDOW_HEIGHT,
-                                 size=18, color=(0.75, 0.78, 0.85, 1))
+        self.text_renderer.render(what_buys, 1046, 130, WINDOW_HEIGHT,
+                                 size=17, color=(0.78, 0.75, 0.85, 1))
 
         y = 170
         for item in PURCHASE_ITEMS:
@@ -544,26 +545,36 @@ class InflationVisualizer:
             else:
                 bar_color = (0.95, 0.35, 0.25)
 
-            self.drawer.draw_rounded_rect(1030, y, 320, 65, (*item_color, 0.08), radius=8)
+            # Draw item background
+            self.drawer.draw_rounded_rect(1030, y, 320, 68, (*item_color, 0.08), radius=8)
 
-            self.text_renderer.render(name, 1045, y + 8, WINDOW_HEIGHT,
-                                     size=22, color=(1, 1, 1, 1))
+            # Item name (left aligned)
+            self.text_renderer.render(name, 1046, y + 10, WINDOW_HEIGHT,
+                                     size=20, color=(1, 1, 1, 1))
 
-            qty_text = f"{current:.1f} / {original:.1f} {unit}"
-            self.text_renderer.render(qty_text, 1330, y + 8, WINDOW_HEIGHT,
-                                     size=16, color=(0.7, 0.72, 0.78, 1))
+            # Quantity values (right aligned)
+            qty_text = f"{current:.1f} / {original:.1f}"
+            self.text_renderer.render(qty_text, 1330, y + 10, WINDOW_HEIGHT,
+                                     size=15, color=(0.75, 0.78, 0.85, 1))
 
-            self.drawer.draw_rounded_rect(1045, y + 40, 290, 16, (0.1, 0.12, 0.18, 1.0), radius=8)
+            # Unit label (below quantity)
+            self.text_renderer.render(unit, 1330, y + 27, WINDOW_HEIGHT,
+                                     size=12, color=(0.6, 0.62, 0.68, 1))
 
+            # Progress bar background
+            self.drawer.draw_rounded_rect(1046, y + 46, 298, 14, (0.1, 0.12, 0.18, 1.0), radius=7)
+
+            # Progress bar fill
             if ratio > 0:
-                self.drawer.draw_rounded_rect(1045, y + 40, 290 * ratio, 16, (*bar_color, 0.9), radius=8)
+                self.drawer.draw_rounded_rect(1046, y + 46, 298 * ratio, 14, (*bar_color, 0.9), radius=7)
 
+            # Loss percentage (right side of bar)
             if ratio < 1:
                 loss_pct = (1 - ratio) * 100
-                self.text_renderer.render(f"-{loss_pct:.0f}%", 1345, y + 38, WINDOW_HEIGHT,
-                                         size=14, color=(0.95, 0.4, 0.35, 0.8))
+                self.text_renderer.render(f"-{loss_pct:.0f}%", 1348, y + 45, WINDOW_HEIGHT,
+                                         size=13, color=(0.95, 0.4, 0.35, 0.85))
 
-            y += 80
+            y += 78
 
     def draw_header(self):
         """Draw title and subtitle."""
@@ -620,6 +631,10 @@ class InflationVisualizer:
 
 def main():
     """Entry point."""
+    # Ensure UTF-8 output on Windows
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+    
     print("=" * 70)
     print("  🇳🇵 NEPAL INFLATION VISUALIZER - Enhanced Edition")
     print("=" * 70)
