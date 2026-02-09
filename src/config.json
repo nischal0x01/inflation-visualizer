@@ -1,0 +1,124 @@
+{
+  "window": {
+    "width": 1400,
+    "height": 900,
+    "title": "🇳🇵 Nepal Inflation Visualizer"
+  },
+  "denominatons": {
+    "5": {
+      "color": [0.91, 0.30, 0.51],
+      "animal": "Yak",
+      "value": 5
+    },
+    "10": {
+      "color": [0.25, 0.52, 0.35],
+      "animal": "Deer",
+      "value": 10
+    },
+    "20": {
+      "color": [0.55, 0.45, 0.38],
+      "animal": "Swamp Deer",
+      "value": 20
+    },
+    "50": {
+      "color": [0.45, 0.52, 0.55],
+      "animal": "Himalayan Tahr",
+      "value": 50
+    },
+    "100": {
+      "color": [0.30, 0.58, 0.40],
+      "animal": "One-Horned Rhino",
+      "value": 100
+    },
+    "500": {
+      "color": [0.72, 0.52, 0.30],
+      "animal": "Tiger",
+      "value": 500
+    },
+    "1000": {
+      "color": [0.58, 0.35, 0.55],
+      "animal": "Elephant",
+      "value": 1000
+    }
+  },
+  "money_regions": {
+    "50": [472, 174, 267, 134],
+    "5": [77, 365, 267, 135],
+    "100": [472, 365, 267, 135],
+    "10": [77, 549, 267, 135],
+    "500": [472, 549, 267, 135],
+    "20": [77, 733, 267, 135],
+    "1000": [472, 733, 267, 135]
+  },
+  "purchase_items": [
+    {
+      "name": "🍚 Rice",
+      "price": 75,
+      "unit": "kg",
+      "color": [0.95, 0.90, 0.80]
+    },
+    {
+      "name": "🥛 Milk",
+      "price": 95,
+      "unit": "L",
+      "color": [0.95, 0.95, 1.0]
+    },
+    {
+      "name": "🍗 Chicken",
+      "price": 450,
+      "unit": "kg",
+      "color": [1.0, 0.85, 0.75]
+    },
+    {
+      "name": "🫘 Dal",
+      "price": 240,
+      "unit": "kg",
+      "color": [0.90, 0.80, 0.50]
+    },
+    {
+      "name": "🚌 Bus Ride",
+      "price": 35,
+      "unit": "trip",
+      "color": [0.70, 0.85, 0.95]
+    },
+    {
+      "name": "☕ Tea",
+      "price": 25,
+      "unit": "cup",
+      "color": [0.85, 0.70, 0.50]
+    }
+  ],
+  "defaults": {
+    "inflation": 7.0,
+    "years": 5,
+    "denomination": "1000"
+  },
+  "text": {
+    "title": "🇳🇵 NEPAL INFLATION VISUALIZER",
+    "subtitle": "See how inflation erodes your money's value over time",
+    "original_size": "Original Size",
+    "current_size": "Current Size:",
+    "controls": "CONTROLS",
+    "inflation_rate": "Inflation Rate",
+    "time_period": "Time Period",
+    "years_label": "years",
+    "purchasing_power": "Purchasing Power",
+    "lost_label": "Lost:",
+    "auto_button": "AUTO",
+    "reset_button": "RESET",
+    "buying_power": "💰 BUYING POWER",
+    "what_buys_today": "What Rs.{denom} buys today:",
+    "footer": "W/S: Inflation • A/D: Years • 1-7: Notes • SPACE: Auto • R: Reset • ESC: Exit"
+  },
+  "controls": {
+    "slider_inflation": [50, 200, 320, 50],
+    "slider_years": [50, 320, 320, 50],
+    "button_auto": [50, 500, 140, 60],
+    "button_reset": [210, 500, 140, 60],
+    "denomination_buttons_start_x": 415,
+    "denomination_buttons_y": 780,
+    "denomination_button_width": 82,
+    "denomination_button_height": 60,
+    "denomination_button_spacing": 90
+  }
+}
