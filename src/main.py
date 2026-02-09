@@ -26,7 +26,6 @@ import numpy as np
 import json
 import math
 import os
-import random
 from pathlib import Path
 
 # Local imports
@@ -54,66 +53,6 @@ CONTROLS = CONFIG["controls"]
 TEXT = CONFIG["text"]
 
 
-# ============ PARTICLE SYSTEM ============
-
-
-class Particle:
-    """Individual particle for visual effects."""
-    
-    def __init__(self, x: float, y: float, color: tuple, particle_type: str = "spark"):
-        self.type = particle_type
-        angle = random.uniform(0, 2 * math.pi)
-
-        if particle_type == "evaporate":
-            # Float upward like smoke
-            speed = random.uniform(30, 80)
-            self.vx = math.cos(angle) * speed * 0.3
-            self.vy = random.uniform(50, 120)
-            self.life = random.uniform(1.5, 3.0)
-            self.size = random.uniform(8, 20)
-        elif particle_type == "money_dust":
-            # Fall like confetti
-            speed = random.uniform(50, 150)
-            self.vx = math.cos(angle) * speed
-            self.vy = random.uniform(-20, 50)
-            self.life = random.uniform(1.0, 2.0)
-            self.size = random.uniform(3, 8)
-        else:
-            # Spark burst
-            speed = random.uniform(150, 450)
-            self.vx = math.cos(angle) * speed
-            self.vy = math.sin(angle) * speed
-            self.life = random.uniform(0.5, 1.2)
-            self.size = random.uniform(4, 12)
-
-        self.x = x
-        self.y = y
-        self.max_life = self.life
-        self.color = color
-        self.rotation = random.uniform(0, 360)
-        self.rot_speed = random.uniform(-180, 180)
-
-    def update(self, dt: float) -> bool:
-        """Update particle. Returns True if still alive."""
-        self.x += self.vx * dt
-        self.y += self.vy * dt
-        self.rotation += self.rot_speed * dt
-
-        if self.type == "evaporate":
-            self.vx += random.uniform(-20, 20) * dt
-            self.vy += 10 * dt
-        elif self.type == "money_dust":
-            self.vy -= 150 * dt
-            self.vx *= 0.99
-        else:
-            self.vy -= 400 * dt
-
-        self.life -= dt
-        return self.life > 0
-
-
-
-
 # ============ MAIN APPLICATION ============
 
 class InflationVisualizer:
@@ -139,8 +78,6 @@ class InflationVisualizer:
         self.scale = 1.0
         self.target_scale = 1.0
         self.displayed_power = 100.0
-        self.particles = []
-        self.evaporate_timer = 0
 
         # Transition animation
         self.prev_denom = self.denom
@@ -271,29 +208,6 @@ class InflationVisualizer:
         # More dramatic scaling - from 1.0 down to 0.25
         return max(0.25, min(1.0, power / 100))
 
-    def spawn_particles(self, x: float, y_top: float, count: int = 25, particle_type: str = "spark"):
-        """Spawn particles at location."""
-        color = DENOMINATIONS[self.denom]["color"]
-        gl_y = flip_y(y_top, WINDOW_HEIGHT)
-        for _ in range(count):
-            self.particles.append(Particle(x, gl_y, color, particle_type))
-
-    def spawn_evaporation(self):
-        """Spawn particles showing money value evaporating."""
-        power = self.calc_power()
-        if power < 95:
-            color = DENOMINATIONS[self.denom]["color"]
-            cx = 700
-            cy_gl = flip_y(420, WINDOW_HEIGHT)
-
-            base_w = ui_theme.MONEY_WIDTH * self.scale
-            base_h = ui_theme.MONEY_HEIGHT * self.scale
-
-            for _ in range(2):
-                edge_x = cx + random.uniform(-base_w/2, base_w/2)
-                edge_y = cy_gl + base_h/2 + random.uniform(-10, 10)
-                self.particles.append(Particle(edge_x, edge_y, color, "evaporate"))
-
     def handle_input(self):
         """Process keyboard and mouse input."""
         mx, my = self.mouse_x, self.mouse_y
@@ -406,15 +320,16 @@ class InflationVisualizer:
             elif self.inflation <= 1:
                 self.auto_dir = 1
 
+        # Smooth scale animation without overshooting
         self.target_scale = self.calc_scale()
         self.scale += (self.target_scale - self.scale) * min(1, dt * ui_theme.SCALE_ANIMATION_SPEED)
 
+        # Smooth power display animation
         target_power = self.calc_power()
         self.displayed_power += (target_power - self.displayed_power) * min(1, dt * ui_theme.POWER_ANIMATION_SPEED)
 
+        # Smooth denomination transition
         self.denom_transition = min(1, self.denom_transition + dt * ui_theme.DENOM_TRANSITION_SPEED)
-
-        # Particles disabled for clean UI
 
     def draw_money(self):
         """Draw money with clean visual effects."""
@@ -650,32 +565,6 @@ class InflationVisualizer:
 
             y += 80
 
-    def draw_particles(self):
-        """Draw particle effects."""
-        glDisable(GL_TEXTURE_2D)
-        for p in self.particles:
-            alpha = (p.life / p.max_life) ** 0.7
-            size = p.size * (0.3 + 0.7 * alpha)
-
-            if p.type == "evaporate":
-                glColor4f(*p.color, alpha * 0.5)
-                segments = 8
-                glBegin(GL_TRIANGLE_FAN)
-                glVertex2f(p.x, p.y)
-                for i in range(segments + 1):
-                    angle = 2 * math.pi * i / segments
-                    glVertex2f(p.x + math.cos(angle) * size,
-                              p.y + math.sin(angle) * size)
-                glEnd()
-            else:
-                glColor4f(*p.color, alpha * 0.9)
-                glBegin(GL_QUADS)
-                glVertex2f(p.x - size, p.y - size)
-                glVertex2f(p.x + size, p.y - size)
-                glVertex2f(p.x + size, p.y + size)
-                glVertex2f(p.x - size, p.y + size)
-                glEnd()
-
     def draw_header(self):
         """Draw title and subtitle."""
         title = TEXT["title"]
@@ -698,7 +587,6 @@ class InflationVisualizer:
         self.draw_left_panel()
         self.draw_center_panel()
         self.draw_right_panel()
-        # Particles disabled for clean UI
 
         self.text_renderer.render(TEXT["footer"], 700, 865, WINDOW_HEIGHT,
                                  size=15, color=(0.4, 0.42, 0.48, 1), center=True)

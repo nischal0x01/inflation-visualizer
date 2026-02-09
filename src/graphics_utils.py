@@ -228,17 +228,17 @@ class GLDrawer:
         except ImportError:
             import ui_theme
         
-        # Subtle shadow
-        self.draw_rounded_rect(x + 4, y_top + 4, w, h, (0.0, 0.0, 0.0, 0.3))
+        # Soft shadow for depth
+        self.draw_rounded_rect(x + 5, y_top + 5, w, h, (0.0, 0.0, 0.0, 0.25))
         
-        # Background
+        # Main panel background
         self.draw_rounded_rect(x, y_top, w, h, ui_theme.BG_PANEL)
         
-        # Clean border
+        # Clean, subtle border
         y = flip_y(y_top, self.window_height) - h
-        glLineWidth(1)
-        glColor4f(0.2, 0.25, 0.35, 0.5)
-        r = 12
+        glLineWidth(1.5)
+        glColor4f(0.25, 0.30, 0.42, 0.4)
+        r = ui_theme.BORDER_RADIUS
         glBegin(GL_LINE_LOOP)
         # Simple rounded rectangle border
         glVertex2f(x + r, y)
@@ -251,11 +251,11 @@ class GLDrawer:
         glVertex2f(x, y + r)
         glEnd()
 
-        # Top accent line
-        self.draw_rect(x + 20, y_top, w - 40, 3, (*accent_color, 0.9))
+        # Top accent line - more visible
+        self.draw_rect(x + 20, y_top, w - 40, 4, (*accent_color, 0.95))
 
         if title:
-            self.text_renderer.render(title, x + 25, y_top + 22, self.window_height,
+            self.text_renderer.render(title, x + 25, y_top + 24, self.window_height,
                                      size=26, color=(*accent_color, 1))
 
     def draw_slider(self, x: float, y_top: float, w: float, h: float, 
@@ -264,68 +264,75 @@ class GLDrawer:
         """Draw a clean slider with label and value display."""
         # Label
         self.text_renderer.render(label, x, y_top - 40, self.window_height, 
-                                 size=22, color=(0.75, 0.78, 0.85, 1))
+                                 size=22, color=(0.70, 0.73, 0.82, 1))
         
-        # Value display
+        # Value display - more prominent
         self.text_renderer.render(show_val, x + w - 100, y_top - 40, self.window_height,
-                                 size=26, color=(*color, 1))
+                                 size=28, color=(*color, 1))
 
-        # Track background
-        self.draw_rounded_rect(x, y_top, w, h, (0.08, 0.1, 0.15, 1.0), radius=h//2)
+        # Track background - darker
+        self.draw_rounded_rect(x, y_top, w, h, (0.05, 0.07, 0.12, 1.0), radius=h//2)
 
-        # Fill bar (no glow)
+        # Fill bar - solid color without glow
         fill_w = max(h, w * (value / max_val))
         if fill_w > 0:
-            self.draw_rounded_rect(x, y_top, fill_w, h, (*color, 0.85), radius=h//2)
+            self.draw_rounded_rect(x, y_top, fill_w, h, (*color, 0.90), radius=h//2)
 
         # Clean handle
-        handle_size = h + 12
+        handle_size = h + 14
         handle_x = x + fill_w - handle_size // 2
-        handle_x = max(x, min(x + w - handle_size, handle_x))
-        handle_y = y_top - 6
+        handle_x = max(x - handle_size // 2, min(x + w - handle_size // 2, handle_x))
+        handle_y = y_top - 7
         
-        # Handle body (simple white circle)
+        # Handle with clean shadow
+        self.draw_rounded_rect(handle_x + 1, handle_y + 1, handle_size, handle_size,
+                              (0.0, 0.0, 0.0, 0.15), radius=handle_size//2)
+        
+        # Handle body - pure white
         self.draw_rounded_rect(handle_x, handle_y, handle_size, handle_size,
-                              (1, 1, 1, 0.95), radius=handle_size//2)
+                              (1, 1, 1, 0.98), radius=handle_size//2)
         
-        # Handle inner color accent
+        # Handle inner accent
         inner_size = handle_size - 8
         self.draw_rounded_rect(handle_x + 4, handle_y + 4, inner_size, 
-                              inner_size, (*color, 0.9), radius=inner_size//2)
+                              inner_size, (*color, 0.85), radius=inner_size//2)
 
     def draw_button(self, x: float, y_top: float, w: float, h: float, 
                    label: str, selected: bool = False, hover: bool = False, 
                    color: tuple = None, press_scale: float = 1.0):
         """Draw a clean button without animations."""
         if selected:
-            bg = color if color else (0.20, 0.75, 0.45, 1.0)
+            bg = color if color else (0.25, 0.80, 0.50, 1.0)
             text_col = (0.02, 0.02, 0.02, 1)
-            border_col = (*bg[:3], 0.6)
+            border_col = (*bg[:3], 0.7)
         elif hover:
-            bg = (0.15, 0.18, 0.25, 1.0)
+            bg = (0.12, 0.15, 0.23, 1.0)
             text_col = (1, 1, 1, 1)
-            border_col = (0.4, 0.45, 0.55, 0.8)
+            border_col = (0.45, 0.50, 0.60, 0.9)
         else:
-            bg = (0.1, 0.12, 0.18, 1.0)
-            text_col = (0.75, 0.78, 0.85, 1)
-            border_col = (0.25, 0.3, 0.4, 0.5)
+            bg = (0.08, 0.10, 0.16, 1.0)
+            text_col = (0.70, 0.73, 0.82, 1)
+            border_col = (0.20, 0.25, 0.35, 0.5)
 
-        # Clean button background
-        self.draw_rounded_rect(x, y_top, w, h, bg, radius=8)
+        # Soft shadow for button depth
+        self.draw_rounded_rect(x + 1, y_top + 1, w, h, (0.0, 0.0, 0.0, 0.15), radius=10)
         
-        # Subtle border
+        # Clean button background
+        self.draw_rounded_rect(x, y_top, w, h, bg, radius=10)
+        
+        # Visible border
         y = flip_y(y_top, self.window_height) - h
-        glLineWidth(1)
+        glLineWidth(1.5)
         glColor4f(*border_col)
         glBegin(GL_LINE_LOOP)
-        glVertex2f(x + 8, y)
-        glVertex2f(x + w - 8, y)
-        glVertex2f(x + w, y + 8)
-        glVertex2f(x + w, y + h - 8)
-        glVertex2f(x + w - 8, y + h)
-        glVertex2f(x + 8, y + h)
-        glVertex2f(x, y + h - 8)
-        glVertex2f(x, y + 8)
+        glVertex2f(x + 10, y)
+        glVertex2f(x + w - 10, y)
+        glVertex2f(x + w, y + 10)
+        glVertex2f(x + w, y + h - 10)
+        glVertex2f(x + w - 10, y + h)
+        glVertex2f(x + 10, y + h)
+        glVertex2f(x, y + h - 10)
+        glVertex2f(x, y + 10)
         glEnd()
 
         self.text_renderer.render(label, x + w // 2, y_top + h // 2 - 12, 
@@ -335,13 +342,13 @@ class GLDrawer:
         """Draw a subtle gradient background."""
         glDisable(GL_TEXTURE_2D)
         
-        # Create vertical gradient (dark at top, slightly lighter at bottom)
+        # Create vertical gradient (darker at top, slightly lighter at bottom)
         glBegin(GL_QUADS)
-        glColor4f(0.02, 0.03, 0.05, 1.0)  # Top
+        glColor4f(0.015, 0.02, 0.04, 1.0)  # Top - deep dark
         glVertex2f(0, height)
         glVertex2f(width, height)
         
-        glColor4f(0.04, 0.05, 0.08, 1.0)  # Bottom
+        glColor4f(0.035, 0.045, 0.07, 1.0)  # Bottom - slightly lighter
         glVertex2f(width, 0)
         glVertex2f(0, 0)
         glEnd()
@@ -349,7 +356,7 @@ class GLDrawer:
     def draw_grid(self, width: int, height: int, grid_size: int = 40):
         """Draw a subtle grid pattern."""
         glDisable(GL_TEXTURE_2D)
-        glColor4f(0.08, 0.1, 0.14, 0.3)
+        glColor4f(0.06, 0.08, 0.12, 0.20)  # Very subtle grid
         glLineWidth(1)
         
         for i in range(0, width, grid_size):
